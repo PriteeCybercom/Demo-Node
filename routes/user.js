@@ -4,6 +4,7 @@ const userModel=require('../models').User;
 const {Op}=require('sequelize');
 const bcrypt=require('bcrypt');
 const jwtConfig = require('../config/jwt-config');
+const JWT=require('jsonwebtoken');
 
 
 //createing a user in the databese api
@@ -57,7 +58,7 @@ router.post('/user',(req,res)=>{
 router.post('/login',(req,res)=>{ 
 
     const {email,password}=req.body;
-    User.findOne({
+    userModel.findOne({
         where:{
             email:email
         }
@@ -70,12 +71,12 @@ router.post('/login',(req,res)=>{
                 let userToken=JWT.sign({ 
                     email:user.email,
                     id:user.id
-                },JwtConfig.secret,{
-                    expiresIn:JwtConfig.expiresIn, //this will be in ms,here 10 minute
-                    notBefore:JwtConfig.notBefore, //after 1 minute we are able to use that
-                    audience:JwtConfig.audience,
-                    issuer:JwtConfig.issuer,
-                    algorithm:JwtConfig.algorithm
+                },jwtConfig.secret,{
+                    expiresIn:jwtConfig.expiresIn, //this will be in ms,here 10 minute
+                    notBefore:jwtConfig.notBefore, //after 1 minute we are able to use that
+                    audience:jwtConfig.audience,
+                    issuer:jwtConfig.issuer,
+                    algorithm:jwtConfig.algorithm
                 });
 
                 //password matched
