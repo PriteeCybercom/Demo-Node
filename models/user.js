@@ -26,9 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
-   //paranoid:true,
-
-   // deletedAt:'destroyTime'
+    paranoid:true,
   });
   return User;
 };
