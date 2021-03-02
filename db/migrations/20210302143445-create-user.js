@@ -8,36 +8,24 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
+      username: {
         type: Sequelize.STRING(50),
         allowNull:false
-      },
-      lastName: {
-        type: Sequelize.STRING(50)
       },
       email: {
         type: Sequelize.STRING(50),
         allowNull:false
       },
-      password:{
-        type: Sequelize.STRING(100),
+      password: {
+        type: Sequelize.STRING(250),
         allowNull:false
       },
-      isActive:{
-        type:Sequelize.ENUM('1','0'),
+      role: {
+        type: Sequelize.ENUM('0','1'),
         defaultValue:'0'
       },
-      city:{
-        type: Sequelize.STRING(50)
-      },
-      state:{
-        type: Sequelize.STRING(50)
-      },
-      address:{
-        type: Sequelize.STRING(200)
-      },
-      phoneno:{
-        type: Sequelize.STRING(30)
+      deletedAt: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -45,9 +33,6 @@ module.exports = {
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      },
-      deletedAt: {
         type: Sequelize.DATE
       }
     });
