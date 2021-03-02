@@ -1,0 +1,8 @@
+{
+    "path":"",
+    "method":"get",
+    "action":"blog.showBlogs",
+    "globalMiddlewares":["globalMiddleware.middleware.isSignedIn","globalMiddleware.middleware.isAdmin"],
+    "middlewares":["blog.isNehaAdmin"],
+    "pathFromRoot":true
+}
