@@ -1,0 +1,8 @@
+
+    {
+        "path": "/",
+        "method": "get",
+        "action": "Prompt.welcome",
+        "public": true,
+        "root": true
+    }

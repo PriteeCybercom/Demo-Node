@@ -1,0 +1,126 @@
+const { readdirSync } = require('fs')
+const chalk = require('chalk')
+const fs = require('fs')
+
+const getDirectories = source =>
+  readdirSync(source, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name)
+
+const apis = getDirectories(__dirname + '/../api');
+
+var publicRoutes = [];
+var protectedRoutes = [];
+var routes = {};
+
+//for..of takes value, for..in takes key
+for(let key in apis){
+    if(fs.existsSync(__dirname+'/../api/'+apis[key]+'/routes.json')){
+        routes = require(`../api/${apis[key]}/routes.json`)
+        if(Array.isArray(routes)){
+            for(let route in routes){
+                var controllerlArr = routes[route].action.split('.')
+                if(controllerlArr.length != 2 || !routes[route].path || !routes[route].method ){
+                    console.log(chalk.black.bgYellowBright('WARNING:')+`There is an problem with API : '${apis[key]}' ROUTE PATH: ${routes[route].path} METHOD: ${routes[route].method}`)
+                } else {
+
+                    // routes
+                    let pathh = routes[route].path.charAt(0) != '/' ? `/${routes[route].path}`: routes[route].path 
+                    if(routes[route].root){
+                        routes[route].path = `/${apis[key]}${pathh}`
+                    }
+                    else {
+                        routes[route].path = `${pathh}`
+                    }
+
+                    // action
+                    var controllerName, funName 
+                    [controllerName, funName] = [controllerlArr[0],controllerlArr[1]]
+                    var func = (require(`../api/${apis[key]}/controllers/${controllerName}`))[funName]
+                    if(!func){
+                        console.log(chalk.black.bgYellowBright('WARNING:')+`There is an problem with API : '${apis[key]}' ACTION: '${funName}' was not found.`)
+                    } else {
+                        routes[route].action = func;
+
+                        //middleware
+                        if('middleware' in routes[route] && Array.isArray(routes[route].middleware)){
+                            var middlewareFun = []
+                            var middleware = []
+                            for(let a of routes[route].middleware) {
+                                if(!(a.includes('.'))) { 
+                                    console.log(chalk.black.bgYellowBright('WARNING:')+`Global Middleware ${routes[route].globalMiddleware} is not properly defined in ${__dirname}/../api/${apis[key]}/routes.json`) 
+                                    break
+                                } else {
+                                    var middlewareArr = a.split('.')
+                                    if(middlewareArr.length != 2){
+                                        console.log(chalk.black.bgYellowBright('WARNING:')+`Middleware is not defined in  routes.json file of ${apis[key]}, PATH: ${pathh}`)
+                                        break
+                                    }
+                                    var [middlewareName, middlewareFunName] = middlewareArr
+                                    middleware.push(middlewareName)
+                                    if(!(require(`../api/${apis[key]}/middleware/${middlewareName}`))[middlewareFunName]){
+                                        console.log(chalk.black.bgYellowBright('WARNING:')+`Middleware ${middlewareFunName} doesn't exists in ${__dirname}/../api/${apis[key]}/middleware/${middlewareName} file.`)
+                                        break;
+                                    } else {
+                                        middlewareFun.push((require(`../api/${apis[key]}/middleware/${middlewareName}`))[middlewareFunName])
+                                    }
+                                }
+                            }
+                            routes[route].middleware = middlewareFun
+                            // console.log(routes[route].middleware)
+                        } else { routes[route].middleware = [] }
+
+                        //global middleware
+                        if('globalMiddleware' in routes[route] && Array.isArray(routes[route].globalMiddleware)){
+                            var globalMiddlewareFun = []
+                            var globalMiddleware = []
+                            
+                            for(let a of routes[route].globalMiddleware) {
+                                if(!(a.includes('.'))) { 
+                                    console.log(chalk.black.bgYellowBright('WARNING:')+`Global Middleware ${routes[route].globalMiddleware} is not properly defined in ${__dirname}/../api/${apis[key]}/routes.json`) 
+                                    break
+                                } else {
+                                    var globalMiddlewareArr = a.split('.');
+                                    if(globalMiddlewareArr.length != 2){
+                                        console.log(chalk.black.bgYellowBright('WARNING:')+` Global Middleware is not defined in  routes.json file of ${apis[key]}, PATH: ${pathh}`)
+                                        break
+                                    }
+                                    var [globalMiddlewareName, globalMiddlewareFunName] = globalMiddlewareArr
+                                    globalMiddleware.push(globalMiddlewareName)
+                                    if(!(require(`../middleware/${globalMiddlewareName}`))[globalMiddlewareFunName]){
+                                        console.log(chalk.black.bgYellowBright('WARNING:')+`Global Middleware ${globalMiddlewareFunName} doesn't exists in ${__dirname}/../middleware/${globalMiddlewareName} file.`)
+                                        break;
+                                    } else {
+                                        globalMiddlewareFun.push((require(`../middleware/${globalMiddlewareName}`))[globalMiddlewareFunName])
+                                    }
+                                }
+                                routes[route].globalMiddleware = globalMiddlewareFun
+                                // console.log("x",routes[route].globalMiddleware)
+                            }
+                        }  else { routes[route].globalMiddleware = [] }
+
+
+                        if(routes[route].public){
+                            publicRoutes.push(routes[route])
+                        } else {
+                            protectedRoutes.push(routes[route])
+                        }
+                    }
+                } 
+            } 
+        } else if(typeof routes === 'object'){
+            console.log(routes.path)
+        } else {
+            console.log(chalk.black.bgYellowBright('WARNING:')+`The format of ${__dirname}/../api/${apis[key]}/routes.json is not correct.`)
+        }
+    } else {
+        console.log(chalk.black.bgYellowBright('WARNING:')+`PATH: ${__dirname}/../api/${apis[key]}/routes.json is not available`) // 1
+    }
+}
+
+// console.log("rr",path)
+
+module.exports = {
+    public: publicRoutes,
+    protected: protectedRoutes 
+}
