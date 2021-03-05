@@ -8,10 +8,8 @@ const bodyParser=require('body-parser');
 const cookieParser=require('cookie-parser');
 const routes=require('./core/routes');
 const fp=require('find-free-port');
-const find = require('find-process')
-const http = require('http')
 
-const getPort = require('get-port');
+
 
 //Middleware
 app.use(bodyParser.json());
@@ -55,13 +53,7 @@ umzug.pending()
 
 
 //my server
-
 let PORT=parseInt(process.env.PORT);
-/* getPort({port:PORT})
-.then(port=>{
-    PORT=port;
-}); */
-
 process.on('uncaughtException', (error) => {
     if (error.code === 'EADDRINUSE') {
         let freeport='';
@@ -76,13 +68,9 @@ process.on('uncaughtException', (error) => {
                 }
             })
         })
-        /* console.log(`${PORT} already in use want to use ${freeport}`)
-        PORT=parseInt(freeport); */
-       // listenServer(); 
     }
 })  
 
-console.log(process.cwd());
 
 function listenServer(){
    app.listen(PORT,()=>{
