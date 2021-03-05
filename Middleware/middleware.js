@@ -1,9 +1,5 @@
 const expressJwt=require('express-jwt');
 
-//Testing purpose
-/* const path=require('path');
-require('dotenv').config({path:path.join(__dirname,'../../../.env')}) */
-
 module.exports={
     isSignedIn:expressJwt({
         secret:process.env.SECRET,

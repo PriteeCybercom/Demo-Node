@@ -5,12 +5,7 @@ const chalk = require('chalk');
 const apis = fs.readdirSync(path.join(__dirname, '..', 'api'), { withFileTypes: true })
 	.filter((dirent) => dirent.isDirectory())
 	.map((dirent) => dirent.name);
-
 let allRoutes = [];
-
-
-
-
 
 for (let api of apis) {
 	if (fs.existsSync(path.join(__dirname,`../api/${api}/routes.json`))){
@@ -67,7 +62,7 @@ for (let api of apis) {
 					continue;
 				}
 
-				
+		    /********************************* Middleware Assignment here****************************/		
                 let middle=[];
                 let totalMiddleware=0;
                 if(route.globalMiddlewares){
@@ -75,21 +70,21 @@ for (let api of apis) {
                     let middlewares=route.globalMiddlewares;
                     for(let middleware of middlewares){
                         let middleArray=middleware.split('.');
-                        if(middleArray.length!=3){
+                        if(middleArray.length!=2){
                             console.log(
                                 chalk.black.bgYellowBright('WARN:') +
                                     `The global middleware is not properly defined of the ${api} routes.json file of path: '${route.path} hence the routes will not be added coorect it to add it'`
                             );
                             break;
                         }
-                        let [folderName,fileName,middlewareFunction]=middleArray;
-                        let func=require(`../api/${folderName}/${fileName}`)[middlewareFunction];
+                        let [fileName,middlewareFunction]=middleArray;
+                        let func=require(`../Middleware/${fileName}`)[middlewareFunction];
                         if(func){
                             middle.push(func);
                         }else{
                             console.log(
                                 chalk.black.bgYellowBright('WARN:') +
-                                    `Middleware '${middlewareFunction}' doesn't exist in ${foldername} middleware of ${fileName}.js file`
+                                    `Middleware '${middlewareFunction}' doesn't exist in globalMiddleware of ${fileName}.js file`
                             );
                             break;
                         }
@@ -151,6 +146,7 @@ for (let api of apis) {
 				}
 				//First we are checking that '/ is there in the path specified in routes.json'
 				//Then we store it in singleRoutePath
+                /****************Assignment of path here (like '/path')***********/
                 if(routes.pathFromRoot){
                     let path = routes.path[0] === '/' ? routes.path : `/${routes.path}`;
                     singleRoute.path = `/${api}${path}`;
@@ -158,6 +154,7 @@ for (let api of apis) {
                     singleRoute.path = routes.path[0] === '/' ? routes.path : `/${routes.path}`;
                 }
 				
+                /**************Assignmnet of method here(get,post,put,delete) */
                 singleRoute.method = routes.method;
 
                
@@ -172,7 +169,7 @@ for (let api of apis) {
 					continue;
 				}
 
-
+                /************************Assignment of action here*******************************/
 				let [ controllerName, functionName ] = controllerArray;
 				let func = require(`../api/${api}/controller/${controllerName}`)[functionName];
 				//Checking whether the function exist in the controller or not if exist add otherwise throw a warning message
@@ -186,6 +183,7 @@ for (let api of apis) {
 					continue;
 				}
 
+                /**********************Assignment of middleware here*******************************/
                 let middle=[];
                 let totalMiddleware=0;
                 if(routes.globalMiddlewares){
@@ -193,21 +191,21 @@ for (let api of apis) {
                     let middlewares=routes.globalMiddlewares;
                     for(let middleware of middlewares){
                         let middleArray=middleware.split('.');
-                        if(middleArray.length!=3){
+                        if(middleArray.length!=2){
                             console.log(
                                 chalk.black.bgYellowBright('WARN:') +
                                     `The global middleware is not properly defined of the ${api} routes.json file of path: '${routes.path} hence the routes will not be added coorect it to add it'`
                             );
                             break;
                         }
-                        let [folderName,fileName,middlewareFunction]=middleArray;
-                        let func=require(`../api/${folderName}/${fileName}`)[middlewareFunction];
+                        let [fileName,middlewareFunction]=middleArray;
+                        let func=require(`../Middleware/${fileName}`)[middlewareFunction];
                         if(func){
                             middle.push(func);
                         }else{
                             console.log(
                                 chalk.black.bgYellowBright('WARN:') +
-                                    `Middleware '${middlewareFunction}' doesn't exist in ${foldername} middleware of ${fileName}.js file`
+                                    `Middleware '${middlewareFunction}' doesn't exist in globalMiddleware of ${fileName}.js file`
                             );
                             break;
                         }
