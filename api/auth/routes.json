@@ -17,6 +17,6 @@
     "path":"/protected",
     "method":"get",
     "action":"auth.protected",
-    "globalMiddlewares":["globalMiddleware.middleware.isSignedIn","globalMiddleware.middleware.isAdmin"],
+    "globalMiddlewares":["middleware.isSignedIn","middleware.isAdmin"],
     "pathFromRoot":true
 }]
