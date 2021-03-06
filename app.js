@@ -71,7 +71,7 @@ process.on('uncaughtException', (error) => {
     }
 })  
 
-
+//function to listen to server
 function listenServer(){
    app.listen(PORT,()=>{
         console.log(chalk.green(`server is listenining on port ${PORT}`));
