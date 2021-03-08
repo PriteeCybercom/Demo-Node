@@ -1,7 +1,11 @@
 const jwt=require('jsonwebtoken');
-const userModel=require('../../../db/models').User;
+const userModel=setup.models.user;
 const {Op}=require('sequelize');
 const bcrypt=require('bcrypt');
+
+// setup.functions[filename][functionName](param1,param2...paramN)
+/* const ans=setup.functions["file1"]["hello"]("nakul");
+console.log(ans);  */
 
 module.exports={
     signup:async(req,res)=>{

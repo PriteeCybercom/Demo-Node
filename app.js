@@ -1,5 +1,9 @@
 require('dotenv').config();
+global.setup={};
 const umzug=require('./core/migration');
+require('./core/models');
+require('./core/function');
+require('./core/services');
 const express=require('express');
 const app=express();
 const chalk=require('chalk');

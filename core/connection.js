@@ -19,5 +19,8 @@ sequelize.authenticate()
 
 sequelize.sync();
 
+setup={connection:sequelize};
+
+
 module.exports=sequelize;
 
