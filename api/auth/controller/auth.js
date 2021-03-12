@@ -2,13 +2,15 @@ const jwt=require('jsonwebtoken');
 const userModel=setup.models.user;
 const {Op}=require('sequelize');
 const bcrypt=require('bcrypt');
+const ExpressError=require('../../../core/ExpressError');
+
 
 // setup.functions[filename][functionName](param1,param2...paramN)
 /* const ans=setup.functions["file1"]["hello"]("nakul");
 console.log(ans);  */
 
 module.exports={
-    signup:async(req,res)=>{
+    signup:async(req,res,next)=>{
         const {username,email,password}=req.body;
         try {
             await userModel.create({
@@ -17,9 +19,7 @@ module.exports={
                 password:bcrypt.hashSync(password,10)
             })
         } catch (error) {
-            res.json({
-                err:error.message
-            })
+            return next(new ExpressError('Please fill out the required fiels',400));    
         }
     },
     signin:(req,res)=>{
