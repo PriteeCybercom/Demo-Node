@@ -12,12 +12,15 @@ const bodyParser=require('body-parser');
 const cookieParser=require('cookie-parser');
 const routes=require('./core/routes');
 const fp=require('find-free-port');
+const morgan=require('morgan');
 
 
 
 //Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(morgan(':remote-addr - ":method :url HTTP/:http-version" :status :res[content-length] [:date[clf]]'))
+
 
 
 //Routes
