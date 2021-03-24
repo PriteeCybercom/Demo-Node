@@ -1,33 +1,49 @@
+const chalk = require('chalk');
 const Sequelize = require('sequelize');
 var config = require('../config/database.json');
-console.log(config.development)
-config = config["development"];
-
-if(!config){
-    console.log("Invalid Database Configuration");
+const Op = Sequelize.Op
+if(config.development){
+    config = config.development
+} else {
+    config = config.production
 }
+
+var flag;
+// if(!config.database){
+//     console.log("You have not done db configuration...");
+// }
+// else {
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,
     dialect: config.dialect/* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
-    logging: config.logging,
+    logging: console.log,
     pool: {
         max: 5,
         min: 0,
         acquire: 30000,
         idle: 10000
     }
-  });
+  })
 
 sequelize.authenticate().then(() => {
-      console.log("Connection has been established successfully. ")
+      console.log(chalk.green("Connection has been established successfully. "))
+      flag = true
   })
 .catch(err => {
-    throw `Unable to connect to the database: ${err}`
+    console.log(chalk.red('ERROR:')+" Unable to connect with the database")
 });
 
-framework = {connection : sequelize};
+// framework = {connection : sequelize};
   
 sequelize.sync();
 
-module.exports = sequelize;
+// if(flag){
+    module.exports = sequelize;
+// } else {
+//     module.exports = flag;
+// }
+
+
+
+// }

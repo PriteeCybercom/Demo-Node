@@ -1,4 +1,3 @@
-/* For migrations */
 const express = require('express')
 const path = require('path');
 const Confirm = require('prompt-confirm');
@@ -8,13 +7,10 @@ let rootPath = path.resolve(__dirname, '../');
 const connection = require('./connection');
 require('dotenv').config()
 const app = express()
-const http = require('http');
-const server = http.createServer()
+var config = require('../config/database.json');
+// if(config.database){
 
-const config = {
-  port: 8000,
-  launched: false,
-};
+try{
 
 var umzug = new Umzug({
     storage: 'sequelize',
@@ -30,50 +26,48 @@ var umzug = new Umzug({
         path: path.join(rootPath, 'db/migrations/')
     }
 });
-
+} catch(err){
+  console.log(chalk.red("Error coming between sequelize and umzug connection..."))
+}
 // umzug.down(/*{ to: '20210223113512-create-address' }*/).then(()=>{
 //   console.log("downn")
 // })
 
 umzug.pending().then(function (migrations) {
+  if(migrations.length>0){
     new Confirm('Wanna do migrations?')
     .run()
     .then(function(answer) {
       if(answer){
-        if(migrations.length > 0){
           console.log("Pending migrations : ")
           migrations.map(a => console.log(chalk.yellow(a.file)))
           umzug.up().then(function()  {
             console.log(chalk.green('Migration complete!'));
-            serverListen(server, config.port);
+            serverListen();
           }).catch(err => {
-            throw `Unable to perform migration due to ${err}`;
-          });
-        } else {
-          console.log(chalk.green("No migrations are pending..."))
-          serverListen(server, config.port);
-        }
+            throw `Unable to perform migration due to`;
+          }); 
       } else {
-        serverListen(server, config.port);
+        serverListen();
       }
     });
-  });
+    // require('../config/config')['first']
+  } else {
+    console.log(chalk.green("No migrations are pending..."))
+    // require('../config/config')['first']
+    serverListen();
+  }
+  }).catch(err =>{
+    console.log(chalk.red("Error coming in migrations..."))
+    // require('../config/config')['first']
+    serverListen()
+  })
+// } else {
+//   serverListen()
+// }
 
-  function serverListen(server, port){
-    // server.on('error', e => {
-    //   console.log(`port ${config.port} is taken`)
-    //   config.port +=1;
-    //   server.close();
-    //   serverListen(server, config.port);
-    // }).listen(port, function() {
-    //   if (config.launched){
-    //     return;
-    //   }
-    //   console.log('Listening on port ' + server.address().port);
-    //   // launchBrowser();
-    //   config.launched = true;
-    // });
-    
+
+  function serverListen(){
     var fp = require("find-free-port")
     var portt = process.env.PORT
     fp(parseInt(portt), function(err, freePort){
@@ -84,16 +78,18 @@ umzug.pending().then(function (migrations) {
         .then(function(answer) {
           if(answer){
             app.listen(parseInt(freePort),()=>{
+              setup.port = parseInt(freePort)
               console.log("listening to "+parseInt(freePort))
             })
           }
         })
       } else {
         app.listen(parseInt(freePort),()=>{
-          console.log("listening to "+parseInt(freePort))
+          setup.port = parseInt(freePort)
+          console.log("listening to "+parseInt(freePort));
         })
       }
-    });
+    })
   }
 
 module.exports = app

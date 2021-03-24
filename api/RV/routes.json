@@ -1,0 +1,33 @@
+[
+  {
+      "path": "/",
+      "method": "get",
+      "action": "RV.welcome",
+      "public": true,
+      "root": false
+  },
+  {
+      "path": "/global",
+      "method": "get",
+      "action": "RV.globall",
+      "public": true,
+      "root": false
+  },
+  {
+      "path": "/student/:id",
+      "method": "get",
+      "action": "RV.getData"
+  },
+  {
+      "path": "/insert",
+      "method": "post",
+      "action": "RV.insert",
+      "root": false,
+      "middleware": ["middle.errorHandler"]
+  },
+  {
+      "path": "/upload",
+      "method": "post",
+      "action": "RV.upload"
+  }
+]

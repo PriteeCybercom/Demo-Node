@@ -81,7 +81,7 @@ function looping(apii,rr,routes, publicRoutes, protectedRoutes){
                 }
                 rr.middleware = middlewareFun
                 // console.log(rr.middleware)
-            } else { rr.middleware = [function(){}] }
+            } else { rr.middleware = [] }
 
             //global middleware
             if('globalMiddleware' in rr && Array.isArray(rr.globalMiddleware)){
@@ -100,17 +100,17 @@ function looping(apii,rr,routes, publicRoutes, protectedRoutes){
                         }
                         var [globalMiddlewareName, globalMiddlewareFunName] = globalMiddlewareArr
                         globalMiddleware.push(globalMiddlewareName)
-                        if(!(require(`../middleware/${globalMiddlewareName}`))[globalMiddlewareFunName]){
-                            console.log(chalk.black.bgYellowBright('WARNING:')+`Global Middleware ${globalMiddlewareFunName} doesn't exists in ${__dirname}\\..\\middleware\\${globalMiddlewareName} file.`)
+                        if(!(require(`../middlewares/${globalMiddlewareName}`))[globalMiddlewareFunName]){
+                            console.log(chalk.black.bgYellowBright('WARNING:')+`Global Middleware ${globalMiddlewareFunName} doesn't exists in ${__dirname}\\..\\middlewares\\${globalMiddlewareName} file.`)
                             return;
                         } else {
-                            globalMiddlewareFun.push((require(`../middleware/${globalMiddlewareName}`))[globalMiddlewareFunName])      
+                            globalMiddlewareFun.push((require(`../middlewares/${globalMiddlewareName}`))[globalMiddlewareFunName])      
                         }
                     }
                     // console.log("x",rr.globalMiddleware)
                 }
                 rr.globalMiddleware = globalMiddlewareFun
-            }  else { rr.globalMiddleware = [function(){}] }
+            }  else { rr.globalMiddleware = [] }
 
 
             if(rr.public){
