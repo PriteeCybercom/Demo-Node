@@ -4,6 +4,7 @@ const umzug=require('./core/migration');
 require('./core/models');
 require('./core/function');
 require('./core/services');
+require('./core/multer')
 const express=require('express');
 const app=express();
 const chalk=require('chalk');
@@ -13,15 +14,36 @@ const cookieParser=require('cookie-parser');
 const routes=require('./core/routes');
 const fp=require('find-free-port');
 const morgan=require('morgan');
-
+const config=require('./config/config.json');
+const crons=require('./core/cron');
 
 
 //Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(morgan(':remote-addr - ":method :url HTTP/:http-version" :status :res[content-length] [:date[clf]]'))
 
+let morganBody='';
+morgan.token('header', function (req) { return JSON.stringify(req.headers) })
+morgan.token('body', function (req) { return (Object.keys(req.body).length==0)?'':JSON.stringify(req.body)})
+const {allowBody,allowHeaders}=config;  
+if(allowBody && allowHeaders){
+    morganBody=':remote-addr - ":method :url HTTP/:http-version" :status :res[content-length] [:date[clf]] :body :header '
+}else if(allowBody || allowHeaders){
+    morganBody=`:remote-addr - ":method :url HTTP/:http-version" :status :res[content-length] [:date[clf]] ${allowBody?':body':':header'} `
+}else{
+    morganBody=':remote-addr - ":method :url HTTP/:http-version" :status :res[content-length] [:date[clf]]';
+}
 
+//logging the details of endpoint
+app.use(morgan(morganBody));
+
+//Running the crons
+app.use((req,res,next)=>{
+    crons.forEach(func=>{
+        func();
+    })
+    next();
+})
 
 //Routes
 for(let route of routes){
@@ -54,6 +76,12 @@ umzug.pending()
     }
 })
 
+//If no routes was matched show 404 not found error
+app.use((req,res,next)=>{
+    const error=new Error('Not Found');
+    error.statusCode=404;
+    next(error);
+})
 
 //Express Error Handling Middleware
 app.use((err,req,res,next)=>{
@@ -64,7 +92,16 @@ app.use((err,req,res,next)=>{
 })
 
 
-
+//Logging the error
+app.use((err,req,res,next)=>{
+    let caller_line = err.stack.split("\n")[1];
+    let index = caller_line.indexOf("at ");
+    let clean = caller_line.slice(index+2, caller_line.length);
+    let lineNumber=clean.substr(-6,2);
+    console.log('Error:'+chalk.red(err.message));
+    console.log(chalk.yellow(`Error occured at:`)+clean);
+    console.log(chalk.yellow('Line Number in which error occured :')+lineNumber)
+})
 
 //my server
 let PORT=parseInt(process.env.PORT);
