@@ -7,7 +7,12 @@
   },
   "host": "localhost:8000",
   "basePath": "/",
-  "tags": [],
+  "tags": [
+    {
+      "name": "students",
+      "description": "Endpoints"
+    }
+  ],
   "schemes": [
     "http"
   ],
@@ -24,8 +29,10 @@
     },
     "/users/{id}": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "students"
+        ],
+        "description": "Endpoint to get the specific user.",
         "parameters": [
           {
             "name": "id",
@@ -34,9 +41,34 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/students"
+            },
+            "description": "User found successfully."
+          }
+        }
       }
     }
   },
-  "definitions": {}
+  "definitions": {
+    "students": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 0
+        },
+        "name": {
+          "type": "string",
+          "example": "xyz"
+        },
+        "email": {
+          "type": "string",
+          "example": "xyz@abc.df"
+        }
+      }
+    }
+  }
 }

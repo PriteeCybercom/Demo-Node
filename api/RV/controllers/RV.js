@@ -7,7 +7,6 @@ const multer = require('multer')
 
 module.exports = {
     welcome: (req,res) => {
-        setup.crons["cron1"]["task"].start()
         var params = "Hiral"
         res.status(200).json({
             status: 1,
@@ -18,6 +17,9 @@ module.exports = {
     },
     globall: setup.functions["funcFile"]["func1"],
     getData: (req,res,next) => {
+        setup.crons["cron1"]["task"].start()
+        /*  #swagger.tags = ['students']
+            #swagger.description = 'Endpoint to get the specific user.' */
         studentModel.findAll({
             where: {
                 // email: {

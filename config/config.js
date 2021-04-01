@@ -1,5 +1,6 @@
 const morgan=require('morgan');
-const app = require('../core/migrations');
+// const app = require('../core/migrations');
+const app = require('../src/app');
 const config = require('./config.json')['morgan-config']
 
 morgan.token('req-headers', function(req,res){
