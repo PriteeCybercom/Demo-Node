@@ -19,4 +19,4 @@ for(let key in apis){
     }
 }
 
-console.log("services", setup.services)
+// console.log("services", setup.services)

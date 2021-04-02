@@ -10,12 +10,6 @@ if(config.development){
     config = config.production
 }
 
-
-// if(!config.database){
-//     console.log("You have not done db configuration...");
-// }
-// else {
-
 async function getSequelize(){
     var sequelize;
     return new Promise((resolve, reject) => {
@@ -100,7 +94,6 @@ async function getSequelize(){
         });
         sequelize.sync();
     }
-    // framework = {connection : sequelize};
     })
 }
 
