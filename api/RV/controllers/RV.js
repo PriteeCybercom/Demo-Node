@@ -51,7 +51,7 @@ module.exports = {
                 message: "Student created successfully"
             })
         }).catch(e=>{
-            const err = new Error(e.name+" : "+setup.findErr(e.errors,'message'))
+            const err = new Error(e.name+" : "+setup.findErr(e))
             err.status = 500
             next(err)
         })
